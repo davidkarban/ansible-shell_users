@@ -1,0 +1,23 @@
+---
+# tasks file for shell_users
+- name: Ensure user do exists
+  tags: shell_users
+  user: 
+    name: "{{ item.name }}"
+    createhome: yes
+    home: "{{ item.home|default(omit) }}"
+    shell: "/bin/bash"
+    groups: "{{ item.groups|default('') }}"
+    state: "{{ item.state|default('present') }}"
+  with_items: shell_users
+
+- name: Ensure ssh key is loaded
+  tags: shell_users
+  authorized_key: 
+    user: "{{ item.name }}"
+    key: "{{ lookup('file', inventory_dir + '/public_keys/' + item.name + '.pub') }}"
+    state: "{{ item.state|default('present') }}"
+  with_items: shell_users
+  when: not shell_users_ignore_keys
+
+

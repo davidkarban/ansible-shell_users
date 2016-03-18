@@ -1,0 +1,11 @@
+---
+# defaults file for shell_users
+shell_users: []
+#  - name: foo
+#    home: /homes/foo
+#    groups: "adm,wheel"
+#    state: present/absent
+
+# false -> do not try to load ssh keys
+shell_users_ignore_keys: false
+
