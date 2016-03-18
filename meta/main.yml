@@ -1,6 +1,6 @@
 galaxy_info:
   author: David Karban
-  description: 
+  description: Role for creating/deleting new users. Can create regular users, or users with random names (for more secure environment).
   company: David Karban
   
   # If the issue tracker for your role is not on github, uncomment the
