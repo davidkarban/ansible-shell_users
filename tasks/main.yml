@@ -18,6 +18,8 @@
     key: "{{ lookup('file', inventory_dir + '/public_keys/' + item.name + '.pub') }}"
     state: "{{ item.state|default('present') }}"
   with_items: "{{ shell_users }}"
-  when: not shell_users_ignore_keys
+  when: 
+    - not shell_users_ignore_keys
+    - item.state|default('present') == "absent"
 
 
