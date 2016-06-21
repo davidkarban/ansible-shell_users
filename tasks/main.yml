@@ -9,7 +9,7 @@
     shell: "/bin/bash"
     groups: "{{ item.groups|default('') }}"
     state: "{{ item.state|default('present') }}"
-  with_items: shell_users
+  with_items: "{{ shell_users }}"
 
 - name: Ensure ssh key is loaded
   tags: shell_users
@@ -17,7 +17,7 @@
     user: "{{ item.name }}"
     key: "{{ lookup('file', inventory_dir + '/public_keys/' + item.name + '.pub') }}"
     state: "{{ item.state|default('present') }}"
-  with_items: shell_users
+  with_items: "{{ shell_users }}"
   when: not shell_users_ignore_keys
 
 
