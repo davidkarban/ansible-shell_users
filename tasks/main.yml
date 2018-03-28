@@ -10,7 +10,7 @@
     state: "{{ item.state|default('present') }}"
   with_items: 
     - "{{ shell_users }}"
-    - "{{ shell_users_additional|default(omit) }}"
+    - "{{ shell_users_additional|default([]) }}"
 
 - name: Ensure ssh key is loaded
   authorized_key:
@@ -19,7 +19,7 @@
     state: "{{ item.state|default('present') }}"
   with_items: 
     - "{{ shell_users }}"
-    - "{{ shell_users_additional|default(omit) }}"
+    - "{{ shell_users_additional|default([]) }}"
   when: 
     - not shell_users_ignore_keys
 
@@ -30,7 +30,7 @@
     validate: /usr/sbin/visudo -cf %s
   with_items: 
     - "{{ shell_users }}"
-    - "{{ shell_users_additional|default(omit) }}"
+    - "{{ shell_users_additional|default([]) }}"
   when:
     - item.state|default("present") == "present"
 
@@ -40,6 +40,6 @@
     state: absent
   with_items: 
     - "{{ shell_users }}"
-    - "{{ shell_users_additional|default(omit) }}"
+    - "{{ shell_users_additional|default([]) }}"
   when:
     - item.state|default("present") == "absent"
