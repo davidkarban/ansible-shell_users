@@ -12,17 +12,6 @@
     - "{{ shell_users }}"
     - "{{ shell_users_additional|default([]) }}"
 
-- name: Ensure ssh key is loaded
-  authorized_key:
-    user: "{{ item.name }}"
-    key: "{{ lookup('file', inventory_dir + '/public_keys/' + item.name + '.pub') }}"
-    state: "{{ item.state|default('present') }}"
-  with_items: 
-    - "{{ shell_users }}"
-    - "{{ shell_users_additional|default([]) }}"
-  when: 
-    - not shell_users_ignore_keys
-
 - name: Ensure sudo on root is available
   copy:
     content: "{{ item.name }} ALL=(ALL) NOPASSWD: ALL\n"
@@ -43,3 +32,16 @@
     - "{{ shell_users_additional|default([]) }}"
   when:
     - item.state|default("present") == "absent"
+
+- name: Ensure ssh key is loaded
+  authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ lookup('file', inventory_dir + '/public_keys/' + item.name + '.pub') }}"
+    state: "{{ item.state|default('present') }}"
+  with_items: 
+    - "{{ shell_users }}"
+    - "{{ shell_users_additional|default([]) }}"
+  when: 
+    - not shell_users_ignore_keys
+  # because nfs and unability to upload keys with no_root_squash
+  ignore_errors: yes
