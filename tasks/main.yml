@@ -8,14 +8,18 @@
     shell: "/bin/bash"
     groups: "{{ item.groups|default('') }}"
     state: "{{ item.state|default('present') }}"
-  with_items: "{{ shell_users }}"
+  with_items: 
+    - "{{ shell_users }}"
+    - "{{ shell_users_additional }}"
 
 - name: Ensure ssh key is loaded
   authorized_key:
     user: "{{ item.name }}"
     key: "{{ lookup('file', inventory_dir + '/public_keys/' + item.name + '.pub') }}"
     state: "{{ item.state|default('present') }}"
-  with_items: "{{ shell_users }}"
+  with_items: 
+    - "{{ shell_users }}"
+    - "{{ shell_users_additional }}"
   when: 
     - not shell_users_ignore_keys
 
@@ -24,15 +28,19 @@
     content: "{{ item.name }} ALL=(ALL) NOPASSWD: ALL\n"
     dest: "/etc/sudoers.d/{{ item.name }}"
     validate: /usr/sbin/visudo -cf %s
-  with_items: "{{ shell_users }}"
+  with_items: 
+    - "{{ shell_users }}"
+    - "{{ shell_users_additional }}"
   when:
-    - item.state == "present"
+    - item.state|default("present") == "present"
 
 - name: Ensure sudo on root is not available
   file:
     path: "/etc/sudoers.d/{{ item.name }}"
     state: absent
-  with_items: "{{ shell_users }}"
+  with_items: 
+    - "{{ shell_users }}"
+    - "{{ shell_users_additional }}"
   when:
-    - item.state == "absent"
+    - item.state|default("present") == "absent"
 
