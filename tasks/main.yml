@@ -1,46 +1,43 @@
 ---
 # tasks file for shell_users
 - name: Ensure user do exists
-  user:
+  ansible.builtin.user:
     name: "{{ item.name }}"
     createhome: yes
     home: "{{ item.home|default(omit) }}"
     shell: "/bin/bash"
     groups: "{{ item.groups|default('') }}"
     state: "{{ item.state|default('present') }}"
-  with_items: 
-    - "{{ shell_users }}"
-    - "{{ shell_users_additional|default([]) }}"
+  loop:
+    "{{ shell_users }}"
 
 - name: Ensure sudo on root is available
-  copy:
+  ansible.builtin.copy:
     content: "{{ item.name }} ALL=(ALL) NOPASSWD: ALL\n"
     dest: "/etc/sudoers.d/{{ item.name }}"
     validate: /usr/sbin/visudo -cf %s
-  with_items: 
-    - "{{ shell_users }}"
-    - "{{ shell_users_additional|default([]) }}"
+  loop:
+    "{{ shell_users }}"
   when:
     - item.state|default("present") == "present"
+    - item.sudo_to_root|default("true") == true
 
 - name: Ensure sudo on root is not available
-  file:
+  ansible.builtin.file:
     path: "/etc/sudoers.d/{{ item.name }}"
     state: absent
-  with_items: 
-    - "{{ shell_users }}"
-    - "{{ shell_users_additional|default([]) }}"
+  loop:
+    "{{ shell_users }}"
   when:
     - item.state|default("present") == "absent"
 
 - name: Ensure ssh key is loaded
-  authorized_key:
+  ansible.posix.authorized_key:
     user: "{{ item.name }}"
     key: "{{ lookup('file', inventory_dir + '/public_keys/' + item.name + '.pub') }}"
     state: "{{ item.state|default('present') }}"
-  with_items: 
-    - "{{ shell_users }}"
-    - "{{ shell_users_additional|default([]) }}"
+  loop:
+    "{{ shell_users }}"
   when: 
     - not shell_users_ignore_keys
   # because nfs and unability to upload keys with no_root_squash
